@@ -1,9 +1,8 @@
 {
   "name": "discord-ticket-system",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "dist/index.js", 
   "scripts": {
-    "start": "ts-node src/index.ts",
     "build": "tsc"
   },
   "dependencies": {
