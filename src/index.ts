@@ -97,6 +97,10 @@ const commands = [
         name: 'close-request',
         description: 'Requests to close the current ticket',
     },
+    {
+        name: 'send-application',
+        description: 'Sends a staff application form',
+    },
 ];
 
 const rest = new REST({ version: '9' }).setToken(token);
