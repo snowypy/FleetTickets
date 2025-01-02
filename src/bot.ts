@@ -7,7 +7,7 @@ import { sendApplicationCommand } from './commands/sendApplication';
 
 export const handleInteraction = async (interaction: Interaction) => {
     if (interaction.isButton()) {
-        if (interaction.id === 'openApplicationModal') {
+        if (interaction.customId === 'openApplicationModal') {
                 const modal = new ModalBuilder()
                     .setCustomId('staffApplicationModal')
                     .setTitle('Staff Application Form');

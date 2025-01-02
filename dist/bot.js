@@ -18,7 +18,7 @@ const sendApplication_1 = require("./commands/sendApplication");
 const handleInteraction = (interaction) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     if (interaction.isButton()) {
-        if (interaction.id === 'openApplicationModal') {
+        if (interaction.customId === 'openApplicationModal') {
             const modal = new discord_js_1.ModalBuilder()
                 .setCustomId('staffApplicationModal')
                 .setTitle('Staff Application Form');
