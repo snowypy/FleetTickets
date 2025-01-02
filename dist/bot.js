@@ -14,6 +14,8 @@ const discord_js_1 = require("discord.js");
 const config_1 = require("./config");
 const close_1 = require("./commands/close");
 const closeRequest_1 = require("./commands/closeRequest");
+const create_panel_1 = require("./commands/create-panel");
+const sendApplication_1 = require("./commands/sendApplication");
 const handleInteraction = (interaction) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e;
     if (interaction.isButton()) {
@@ -64,46 +66,37 @@ const handleInteraction = (interaction) => __awaiter(void 0, void 0, void 0, fun
     }
     else if (interaction.isCommand()) {
         if (interaction.commandName === 'create-panel') {
-            const embed = new discord_js_1.EmbedBuilder()
-                .setTitle('Open a Ticket – Let’s Purr-sue the Issue!')
-                .setDescription('Reach out to our paw-some staff for support with any issue you’re facing!\n\nIn the future, you’ll be asked to choose a category for your ticket – it’ll help us purr-iotize your issue faster than a cat chasing a laser pointer!')
-                .addFields([
-                { name: 'General Support', value: 'The quickest and purr-fect way to reach out to our team is through this panel. We’ll be purr-sisting until your problem is solved!' },
-                { name: 'Blacklist Issues', value: 'Having trouble with the blacklist? Don’t fur-get to create a ticket here so we can look into it. We’ll be paw-sitive about fixing it!' },
-                { name: 'Alliance Issues', value: 'Got some kitty drama in your alliance? Drop us a ticket here, and we’ll help sort things out in a cat-astrophic hurry!' },
-            ])
-                .setColor('#FFD1DC')
-                .setFooter({ text: 'Sea Cat Scallywags', iconURL: ((_d = interaction.client.user) === null || _d === void 0 ? void 0 : _d.avatarURL()) || '' })
-                .setTimestamp()
-                .setThumbnail(((_e = interaction.guild) === null || _e === void 0 ? void 0 : _e.iconURL()) || '');
-            yield interaction.reply({ content: 'The panel has been sent to the channel.', fetchReply: true, ephemeral: true });
-            if (interaction.channel instanceof discord_js_1.TextChannel) {
-                interaction.channel.send({
-                    embeds: [embed],
-                    components: [
-                        {
-                            type: 1,
-                            components: [
-                                {
-                                    type: 2,
-                                    label: 'Create Ticket',
-                                    style: 1,
-                                    customId: 'create-ticket-button',
-                                },
-                            ],
-                        },
-                    ],
-                });
-            }
-            else {
-                console.error('Channel type does not support sending messages.');
-            }
+            yield (0, create_panel_1.createPanelCommand)(interaction);
         }
         else if (interaction.commandName === 'close') {
             yield (0, close_1.closeCommand)(interaction);
         }
         else if (interaction.commandName === 'close-request') {
             yield (0, closeRequest_1.closeRequestCommand)(interaction);
+        }
+        else if (interaction.commandName === 'send-application') {
+            yield (0, sendApplication_1.sendApplicationCommand)(interaction);
+        }
+    }
+    else if (interaction.isModalSubmit()) {
+        if (interaction.customId === 'staffApplicationModal') {
+            const why = interaction.fields.getTextInputValue('whyInput');
+            const vouch = interaction.fields.getTextInputValue('vouchInput');
+            const experience = interaction.fields.getTextInputValue('experienceInput');
+            const importants = interaction.fields.getTextInputValue('importantsInput');
+            const extras = interaction.fields.getTextInputValue('extrasInput');
+            const applicationEmbed = new discord_js_1.EmbedBuilder()
+                .setTitle(':white_check_mark: New Staff Application :white_check_mark:')
+                .setAuthor({ name: interaction.user.displayName, iconURL: interaction.user.displayAvatarURL() })
+                .addFields({ name: 'Why do you wish to be staff?', value: why }, { name: 'Can any Current Staff Vouch for you?', value: vouch }, { name: 'Have you previously been a staff member here or on any other server? Please list any relevant life experience.', value: experience }, { name: 'What is your Age? Time Zone? What console do you play on?', value: importants }, { name: 'Anything else?', value: extras })
+                .setColor('#FFD1DC')
+                .setFooter({ text: 'Sea Cat Scallywags', iconURL: ((_d = interaction.client.user) === null || _d === void 0 ? void 0 : _d.avatarURL()) || '' })
+                .setTimestamp();
+            const applicationChannel = (_e = interaction.guild) === null || _e === void 0 ? void 0 : _e.channels.cache.get(`${process.env.APPLICATION_CHANNEL_ID}`);
+            if (applicationChannel) {
+                yield applicationChannel.send({ embeds: [applicationEmbed] });
+            }
+            yield interaction.reply({ content: 'Your application has been submitted!', ephemeral: true });
         }
     }
 });
