@@ -1,4 +1,4 @@
-import { Interaction, ChannelType, EmbedBuilder, TextChannel, ModalSubmitInteraction } from 'discord.js';
+import { Interaction, ChannelType, ModalBuilder, TextInputStyle, TextInputBuilder, ActionRowBuilder, EmbedBuilder, TextChannel, ModalSubmitInteraction } from 'discord.js';
 import { staffRoleId } from './config';
 import { closeCommand } from './commands/close';
 import { closeRequestCommand } from './commands/closeRequest';
@@ -7,54 +7,51 @@ import { sendApplicationCommand } from './commands/sendApplication';
 
 export const handleInteraction = async (interaction: Interaction) => {
     if (interaction.isButton()) {
-        if (interaction.customId === 'create-panel') {
-            
-        } else if (interaction.customId === 'create-ticket-button') {
-            try {
-                const channelId = interaction.channelId;
-
-                if (!interaction.channel) {
-                    return;
-                }
-
-                const thread = await (interaction.channel as TextChannel).threads.create({
-                    name: `support-${interaction.user.username}`,
-                    autoArchiveDuration: 60,
-                    type: ChannelType.PrivateThread,
-                    reason: `Created by <@${interaction.user.id}>`,
-                });
-
-                if (thread) {
-                    const welcomeEmbed = new EmbedBuilder()
-                        .setTitle(':wave: Welcome to Sea Cats Support! :wave:')
-                        .setDescription('Thanks for making a ticket. A member of our team will be with you ASAP.\n\n**Please be clear when describing your issue.**')
-                        .setColor('#FFD1DC')
-                        .setThumbnail(interaction.guild?.iconURL() || '')
-                        .setTimestamp()
-                        .setFooter({ text: 'Sea Cat Scallywags', iconURL: interaction.client.user?.avatarURL() || '' });
-
-                    await thread.send({ content: `<@&${staffRoleId}>`, embeds: [welcomeEmbed] });
-                    await thread.members.add(interaction.user.id);
-
-                    const createdTicketEmbed = new EmbedBuilder()
-                        .setTitle(':white_check_mark: Ticket Created :white_check_mark:')
-                        .setDescription(`Your ticket has been created. <#${thread.id}>\n\n**Please respect staff in your ticket to avoid a ticket suspension or blacklist.**`)
-                        .setColor('#FFD1DC')
-                        .setTimestamp()
-                        .setFooter({ text: 'Sea Cat Scallywags', iconURL: interaction.client.user?.avatarURL() || '' });
-
-                    await interaction.reply({
-                        embeds: [createdTicketEmbed],
-                        ephemeral: true,
-                    });
-                    console.log(`Created a new ticket: support-${interaction.user.username}`);
-                } else {
-                    console.error('Hit a snag creating a new ticket.');
-                }
-            } catch (error) {
-                console.error('Hit a snag creating a new ticket.', error);
+        if (interaction.id === 'openApplicationModal') {
+                const modal = new ModalBuilder()
+                    .setCustomId('staffApplicationModal')
+                    .setTitle('Staff Application Form');
+        
+                const whyInput = new TextInputBuilder()
+                    .setCustomId('whyInput')
+                    .setLabel('Why do you wish to be staff?')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setRequired(true);
+        
+                const vouchInput = new TextInputBuilder()
+                    .setCustomId('vouchInput')
+                    .setLabel('Can any Current Staff Vouch for you?')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setRequired(true);
+        
+                const experienceInput = new TextInputBuilder()
+                    .setCustomId('experienceInput')
+                    .setLabel('Have you previously been a staff member here or on any other server? Please list any relevant life experience.')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setRequired(true);
+        
+                const importantsInput = new TextInputBuilder()
+                    .setCustomId('importantsInput')
+                    .setLabel('What is your Age? Time Zone? What console do you play on?')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setRequired(true);
+        
+                const extrasInput = new TextInputBuilder()
+                    .setCustomId('extrasInput')
+                    .setLabel('Anything else you would like to add?')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setRequired(false);
+        
+                const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(whyInput);
+                const secondActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(vouchInput);
+                const thirdActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(experienceInput);
+                const fourthActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(importantsInput);
+                const fifthActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(extrasInput);
+        
+                modal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow, fifthActionRow);
+        
+                await interaction.showModal(modal);
             }
-        }
     } else if (interaction.isCommand()) {
         if (interaction.commandName === 'create-panel') {
             await createPanelCommand(interaction);
@@ -75,14 +72,16 @@ export const handleInteraction = async (interaction: Interaction) => {
 
             const applicationEmbed = new EmbedBuilder()
                 .setTitle(':white_check_mark: New Staff Application :white_check_mark:')
-                .setAuthor({ name: interaction.user.displayName, iconURL: interaction.user.displayAvatarURL() })
+                .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                 .addFields(
                     { name: 'Why do you wish to be staff?', value: why },
                     { name: 'Can any Current Staff Vouch for you?', value: vouch },
                     { name: 'Have you previously been a staff member here or on any other server? Please list any relevant life experience.', value: experience },
                     { name: 'What is your Age? Time Zone? What console do you play on?', value: importants },
-                    { name: 'Anything else?', value: extras }
+                    { name: 'Anything else?', value: extras },
+                    { name: 'Discord ID', value: interaction.user.id }
                 )
+                .setThumbnail(interaction.user.displayAvatarURL())
                 .setColor('#FFD1DC')
                 .setFooter({ text: 'Sea Cat Scallywags', iconURL: interaction.client.user?.avatarURL() || '' })
                 .setTimestamp();

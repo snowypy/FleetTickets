@@ -11,57 +11,49 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleInteraction = void 0;
 const discord_js_1 = require("discord.js");
-const config_1 = require("./config");
 const close_1 = require("./commands/close");
 const closeRequest_1 = require("./commands/closeRequest");
 const create_panel_1 = require("./commands/create-panel");
 const sendApplication_1 = require("./commands/sendApplication");
 const handleInteraction = (interaction) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e;
+    var _a, _b;
     if (interaction.isButton()) {
-        if (interaction.customId === 'create-panel') {
-        }
-        else if (interaction.customId === 'create-ticket-button') {
-            try {
-                const channelId = interaction.channelId;
-                if (!interaction.channel) {
-                    return;
-                }
-                const thread = yield interaction.channel.threads.create({
-                    name: `support-${interaction.user.username}`,
-                    autoArchiveDuration: 60,
-                    type: discord_js_1.ChannelType.PrivateThread,
-                    reason: `Created by <@${interaction.user.id}>`,
-                });
-                if (thread) {
-                    const welcomeEmbed = new discord_js_1.EmbedBuilder()
-                        .setTitle(':wave: Welcome to Sea Cats Support! :wave:')
-                        .setDescription('Thanks for making a ticket. A member of our team will be with you ASAP.\n\n**Please be clear when describing your issue.**')
-                        .setColor('#FFD1DC')
-                        .setThumbnail(((_a = interaction.guild) === null || _a === void 0 ? void 0 : _a.iconURL()) || '')
-                        .setTimestamp()
-                        .setFooter({ text: 'Sea Cat Scallywags', iconURL: ((_b = interaction.client.user) === null || _b === void 0 ? void 0 : _b.avatarURL()) || '' });
-                    yield thread.send({ content: `<@&${config_1.staffRoleId}>`, embeds: [welcomeEmbed] });
-                    yield thread.members.add(interaction.user.id);
-                    const createdTicketEmbed = new discord_js_1.EmbedBuilder()
-                        .setTitle(':white_check_mark: Ticket Created :white_check_mark:')
-                        .setDescription(`Your ticket has been created. <#${thread.id}>\n\n**Please respect staff in your ticket to avoid a ticket suspension or blacklist.**`)
-                        .setColor('#FFD1DC')
-                        .setTimestamp()
-                        .setFooter({ text: 'Sea Cat Scallywags', iconURL: ((_c = interaction.client.user) === null || _c === void 0 ? void 0 : _c.avatarURL()) || '' });
-                    yield interaction.reply({
-                        embeds: [createdTicketEmbed],
-                        ephemeral: true,
-                    });
-                    console.log(`Created a new ticket: support-${interaction.user.username}`);
-                }
-                else {
-                    console.error('Hit a snag creating a new ticket.');
-                }
-            }
-            catch (error) {
-                console.error('Hit a snag creating a new ticket.', error);
-            }
+        if (interaction.id === 'openApplicationModal') {
+            const modal = new discord_js_1.ModalBuilder()
+                .setCustomId('staffApplicationModal')
+                .setTitle('Staff Application Form');
+            const whyInput = new discord_js_1.TextInputBuilder()
+                .setCustomId('whyInput')
+                .setLabel('Why do you wish to be staff?')
+                .setStyle(discord_js_1.TextInputStyle.Paragraph)
+                .setRequired(true);
+            const vouchInput = new discord_js_1.TextInputBuilder()
+                .setCustomId('vouchInput')
+                .setLabel('Can any Current Staff Vouch for you?')
+                .setStyle(discord_js_1.TextInputStyle.Paragraph)
+                .setRequired(true);
+            const experienceInput = new discord_js_1.TextInputBuilder()
+                .setCustomId('experienceInput')
+                .setLabel('Have you previously been a staff member here or on any other server? Please list any relevant life experience.')
+                .setStyle(discord_js_1.TextInputStyle.Paragraph)
+                .setRequired(true);
+            const importantsInput = new discord_js_1.TextInputBuilder()
+                .setCustomId('importantsInput')
+                .setLabel('What is your Age? Time Zone? What console do you play on?')
+                .setStyle(discord_js_1.TextInputStyle.Paragraph)
+                .setRequired(true);
+            const extrasInput = new discord_js_1.TextInputBuilder()
+                .setCustomId('extrasInput')
+                .setLabel('Anything else you would like to add?')
+                .setStyle(discord_js_1.TextInputStyle.Paragraph)
+                .setRequired(false);
+            const firstActionRow = new discord_js_1.ActionRowBuilder().addComponents(whyInput);
+            const secondActionRow = new discord_js_1.ActionRowBuilder().addComponents(vouchInput);
+            const thirdActionRow = new discord_js_1.ActionRowBuilder().addComponents(experienceInput);
+            const fourthActionRow = new discord_js_1.ActionRowBuilder().addComponents(importantsInput);
+            const fifthActionRow = new discord_js_1.ActionRowBuilder().addComponents(extrasInput);
+            modal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow, fifthActionRow);
+            yield interaction.showModal(modal);
         }
     }
     else if (interaction.isCommand()) {
@@ -87,12 +79,13 @@ const handleInteraction = (interaction) => __awaiter(void 0, void 0, void 0, fun
             const extras = interaction.fields.getTextInputValue('extrasInput');
             const applicationEmbed = new discord_js_1.EmbedBuilder()
                 .setTitle(':white_check_mark: New Staff Application :white_check_mark:')
-                .setAuthor({ name: interaction.user.displayName, iconURL: interaction.user.displayAvatarURL() })
-                .addFields({ name: 'Why do you wish to be staff?', value: why }, { name: 'Can any Current Staff Vouch for you?', value: vouch }, { name: 'Have you previously been a staff member here or on any other server? Please list any relevant life experience.', value: experience }, { name: 'What is your Age? Time Zone? What console do you play on?', value: importants }, { name: 'Anything else?', value: extras })
+                .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
+                .addFields({ name: 'Why do you wish to be staff?', value: why }, { name: 'Can any Current Staff Vouch for you?', value: vouch }, { name: 'Have you previously been a staff member here or on any other server? Please list any relevant life experience.', value: experience }, { name: 'What is your Age? Time Zone? What console do you play on?', value: importants }, { name: 'Anything else?', value: extras }, { name: 'Discord ID', value: interaction.user.id })
+                .setThumbnail(interaction.user.displayAvatarURL())
                 .setColor('#FFD1DC')
-                .setFooter({ text: 'Sea Cat Scallywags', iconURL: ((_d = interaction.client.user) === null || _d === void 0 ? void 0 : _d.avatarURL()) || '' })
+                .setFooter({ text: 'Sea Cat Scallywags', iconURL: ((_a = interaction.client.user) === null || _a === void 0 ? void 0 : _a.avatarURL()) || '' })
                 .setTimestamp();
-            const applicationChannel = (_e = interaction.guild) === null || _e === void 0 ? void 0 : _e.channels.cache.get(`${process.env.APPLICATION_CHANNEL_ID}`);
+            const applicationChannel = (_b = interaction.guild) === null || _b === void 0 ? void 0 : _b.channels.cache.get(`${process.env.APPLICATION_CHANNEL_ID}`);
             if (applicationChannel) {
                 yield applicationChannel.send({ embeds: [applicationEmbed] });
             }
