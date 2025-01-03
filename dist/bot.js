@@ -21,30 +21,35 @@ const handleInteraction = (interaction) => __awaiter(void 0, void 0, void 0, fun
         if (interaction.customId === 'openApplicationModal') {
             const modal = new discord_js_1.ModalBuilder()
                 .setCustomId('staffApplicationModal')
-                .setTitle('Staff Application Form');
+                .setTitle('Staff Application');
             const whyInput = new discord_js_1.TextInputBuilder()
                 .setCustomId('whyInput')
                 .setLabel('Why do you wish to be staff?')
+                .setPlaceholder('I want to help the server grow and develop!')
                 .setStyle(discord_js_1.TextInputStyle.Paragraph)
                 .setRequired(true);
             const vouchInput = new discord_js_1.TextInputBuilder()
                 .setCustomId('vouchInput')
                 .setLabel('Can any Current Staff Vouch for you?')
+                .setPlaceholder('No, I don\'t have anyone to vouch for me')
                 .setStyle(discord_js_1.TextInputStyle.Paragraph)
                 .setRequired(true);
             const experienceInput = new discord_js_1.TextInputBuilder()
                 .setCustomId('experienceInput')
-                .setLabel('Have you previously been a staff member here or on any other server? Please list any relevant life experience.')
+                .setLabel('Have you been staff anywhere before?')
+                .setPlaceholder('If so, where?')
                 .setStyle(discord_js_1.TextInputStyle.Paragraph)
                 .setRequired(true);
             const importantsInput = new discord_js_1.TextInputBuilder()
                 .setCustomId('importantsInput')
-                .setLabel('What is your Age? Time Zone? What console do you play on?')
-                .setStyle(discord_js_1.TextInputStyle.Paragraph)
+                .setLabel('Age? Timezone? Platform?')
+                .setPlaceholder('18/GMT/PC+XBOX_SERIES_X')
+                .setStyle(discord_js_1.TextInputStyle.Short)
                 .setRequired(true);
             const extrasInput = new discord_js_1.TextInputBuilder()
                 .setCustomId('extrasInput')
                 .setLabel('Anything else you would like to add?')
+                .setPlaceholder('Yes, I want to be staff!')
                 .setStyle(discord_js_1.TextInputStyle.Paragraph)
                 .setRequired(false);
             const firstActionRow = new discord_js_1.ActionRowBuilder().addComponents(whyInput);
