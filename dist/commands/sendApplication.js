@@ -24,6 +24,6 @@ const sendApplicationCommand = (interaction) => __awaiter(void 0, void 0, void 0
         .setLabel('Apply Now')
         .setStyle(discord_js_1.ButtonStyle.Primary);
     const buttonRow = new discord_js_1.ActionRowBuilder().addComponents(button);
-    yield interaction.reply({ embeds: [embed], components: [buttonRow], ephemeral: true });
+    yield interaction.reply({ embeds: [embed], components: [buttonRow], ephemeral: false });
 });
 exports.sendApplicationCommand = sendApplicationCommand;

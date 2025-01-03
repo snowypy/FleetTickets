@@ -15,5 +15,5 @@ export const sendApplicationCommand = async (interaction: CommandInteraction) =>
 
     const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
 
-    await interaction.reply({ embeds: [embed], components: [buttonRow], ephemeral: true });
+    await interaction.reply({ embeds: [embed], components: [buttonRow], ephemeral: false });
 };
